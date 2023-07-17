@@ -1,4 +1,5 @@
 import { Schema, model, models } from 'mongoose'
+import OptionSchema from '@models/option'
 
 const PostSchema = new Schema({
   title: {
@@ -7,31 +8,28 @@ const PostSchema = new Schema({
   },
   author: {
     type: String,
-    required: true
+    required: true,
   },
   createdAt: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
   updatedAt: {
-    type: Date
+    type: Date,
   },
   content: {
     type: String,
-    required: true
+    required: true,
   },
   upVoteCount: {
     type: Number,
-    default: 0
+    default: 0,
   },
   downVoteCount: {
     type: Number,
-    default: 0
+    default: 0,
   },
-  pollID: {
-    type: Schema.Types.ObjectId,
-    required: true
-  }
+  options: [OptionSchema],
 })
 
 const Post = models.Post || model('Post', PostSchema)
