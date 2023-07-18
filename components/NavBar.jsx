@@ -2,14 +2,16 @@
 
 import React, { useEffect, useState } from 'react'
 import {
-  Flex,
+  HStack,
   Box,
   Button,
   Menu,
   MenuButton,
   MenuList,
   MenuItem,
+  IconButton,
 } from '@chakra-ui/react'
+import { AddIcon } from '@chakra-ui/icons'
 import { signIn, signOut, useSession, getProviders } from 'next-auth/react'
 
 const NavBar = () => {
@@ -26,9 +28,12 @@ const NavBar = () => {
 
   return (
     <Box bg="#1d3557" w="100%" padding="2">
-      <Flex align="center" justifyContent={'end'} justify="space-between">
+      <HStack align="center" justifyContent={'flex-end'} spacing="24px">
         {session?.user ? (
-          <Button onClick={signOut}>Log out</Button>
+          <>
+            <IconButton aria-label="Post" icon={<AddIcon />} />
+            <Button onClick={signOut}>Log out</Button>
+          </>
         ) : (
           <Menu>
             <MenuButton as={Button}>Sign In</MenuButton>
@@ -45,7 +50,7 @@ const NavBar = () => {
             </MenuList>
           </Menu>
         )}
-      </Flex>
+      </HStack>
     </Box>
   )
 }

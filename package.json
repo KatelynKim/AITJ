@@ -10,10 +10,12 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@chakra-ui/icons": "^2.0.19",
     "@chakra-ui/next-js": "^2.1.4",
     "@chakra-ui/react": "^2.7.1",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
+    "draft-js": "^0.11.7",
     "eslint": "8.44.0",
     "eslint-config-next": "13.4.7",
     "framer-motion": "^10.12.18",
@@ -21,7 +23,8 @@
     "next": "13.4.7",
     "next-auth": "^4.22.1",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "react-draft-wysiwyg": "^1.15.0"
   },
   "devDependencies": {
     "eslint-config-prettier": "^8.8.0",

@@ -1,7 +1,9 @@
+'use client'
 import './globals.css'
 import { Inter } from 'next/font/google'
 import { Providers } from './providers'
 import Nav from '../components/NavBar'
+import { Box } from '@chakra-ui/react'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -16,7 +18,9 @@ export default function RootLayout({ children }) {
       <body className={inter.className}>
         <Providers>
           <Nav />
-          {children}
+          <Box paddingX="24" paddingY="10">
+            {children}
+          </Box>
         </Providers>
       </body>
     </html>
