@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import NextLink from 'next/link'
 import {
   HStack,
   Box,
@@ -10,6 +11,7 @@ import {
   MenuList,
   MenuItem,
   IconButton,
+  Link,
 } from '@chakra-ui/react'
 import { AddIcon } from '@chakra-ui/icons'
 import { signIn, signOut, useSession, getProviders } from 'next-auth/react'
@@ -31,7 +33,9 @@ const NavBar = () => {
       <HStack align="center" justifyContent={'flex-end'} spacing="24px">
         {session?.user ? (
           <>
-            <IconButton aria-label="Post" icon={<AddIcon />} />
+            <NextLink href="/post">
+              <IconButton aria-label="Post" icon={<AddIcon />}></IconButton>
+            </NextLink>
             <Button onClick={signOut}>Log out</Button>
           </>
         ) : (
