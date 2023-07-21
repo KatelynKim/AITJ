@@ -8,6 +8,9 @@ export const GET = async (request, { params }) => {
     const post = await Post.findById(params.id)
     if (!post) return new Response('Post Not Found', { status: 404 })
 
+    post.viewCount += 1
+    await post.save()
+
     return new Response(JSON.stringify(post), { status: 200 })
   } catch (error) {
     return new Response('Internal Server Error', { status: 500 })

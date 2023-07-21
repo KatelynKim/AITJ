@@ -15,6 +15,7 @@ export const POST = async (request) => {
       title,
       content,
       options = defaultOptions,
+      votingLength,
     } = await request.json()
 
     await connectToDB()
@@ -23,6 +24,7 @@ export const POST = async (request) => {
       title,
       content,
       options,
+      votingLength,
     })
 
     await newPost.save()

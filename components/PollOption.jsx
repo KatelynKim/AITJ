@@ -30,6 +30,7 @@ const PollOption = (
       <Input
         placeholder={`Option ${optionId}`}
         marginRight={4}
+        marginBottom={2}
         ref={ref}
         value={inputValue || ''}
         onChange={handleInputChange}

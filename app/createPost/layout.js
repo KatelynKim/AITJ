@@ -1,5 +1,5 @@
 'use client'
-import { Box, HStack, VStack, Flex } from '@chakra-ui/react'
+import { Box, Flex } from '@chakra-ui/react'
 import Placeholder from 'components/Placeholder'
 
 export default function PostCreationLayout({ children }) {

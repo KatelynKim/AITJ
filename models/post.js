@@ -18,7 +18,7 @@ const PostSchema = new Schema({
     type: Date,
   },
   content: {
-    type: String,
+    type: Object,
     required: true,
   },
   upVoteCount: {
@@ -30,6 +30,14 @@ const PostSchema = new Schema({
     default: 0,
   },
   options: [OptionSchema],
+  votingLength: {
+    type: Number,
+    required: true,
+  },
+  viewCount: {
+    type: Number,
+    default: 0,
+  },
 })
 
 const Post = models.Post || model('Post', PostSchema)

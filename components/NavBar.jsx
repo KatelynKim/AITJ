@@ -15,6 +15,7 @@ import {
 } from '@chakra-ui/react'
 import { AddIcon } from '@chakra-ui/icons'
 import { signIn, signOut, useSession, getProviders } from 'next-auth/react'
+import Image from 'next/image'
 
 const NavBar = () => {
   const { data: session } = useSession()
@@ -29,18 +30,32 @@ const NavBar = () => {
   }, [])
 
   return (
-    <Box bg="#1d3557" w="100%" padding="2">
+    <HStack
+      bg="#1d3557"
+      w="100%"
+      padding="2"
+      justifyContent={'space-between'}
+      paddingX={5}
+    >
+      <Image
+        src="/logo-yellow.svg"
+        width={120}
+        height={20}
+        alt={'Am I the Jerk (AITJ) website logo'}
+      />
       <HStack align="center" justifyContent={'flex-end'} spacing="24px">
         {session?.user ? (
           <>
-            <NextLink href="/post">
+            <NextLink href="/createPost">
               <IconButton aria-label="Post" icon={<AddIcon />}></IconButton>
             </NextLink>
             <Button onClick={signOut}>Log out</Button>
           </>
         ) : (
           <Menu>
-            <MenuButton as={Button}>Sign In</MenuButton>
+            <MenuButton bg={'#ffda3a'} as={Button}>
+              Sign In
+            </MenuButton>
             <MenuList>
               {providers &&
                 Object.values(providers).map((provider) => (
@@ -55,7 +70,7 @@ const NavBar = () => {
           </Menu>
         )}
       </HStack>
-    </Box>
+    </HStack>
   )
 }
 
