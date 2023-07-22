@@ -3,7 +3,13 @@ import React from 'react'
 
 const BorderedBox = ({ children, ...rest }) => {
   return (
-    <Box border={'1px solid #e5e5e5'} borderRadius={8} bg={'white'} {...rest}>
+    <Box
+      border={'1px solid #e5e5e5'}
+      gap={10}
+      borderRadius={8}
+      bg={'white'}
+      {...rest}
+    >
       {children}
     </Box>
   )

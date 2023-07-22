@@ -11,7 +11,8 @@ const defaultOptions = [
 export const POST = async (request) => {
   try {
     const {
-      author,
+      userId,
+      username,
       title,
       content,
       options = defaultOptions,
@@ -20,7 +21,8 @@ export const POST = async (request) => {
 
     await connectToDB()
     const newPost = new Post({
-      author,
+      userId,
+      username,
       title,
       content,
       options,

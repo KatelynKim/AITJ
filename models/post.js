@@ -6,7 +6,11 @@ const PostSchema = new Schema({
     type: String,
     required: [true, 'Title is required'],
   },
-  author: {
+  userId: {
+    type: String,
+    required: true,
+  },
+  username: {
     type: String,
     required: true,
   },
@@ -18,7 +22,7 @@ const PostSchema = new Schema({
     type: Date,
   },
   content: {
-    type: Object,
+    type: String,
     required: true,
   },
   upVoteCount: {

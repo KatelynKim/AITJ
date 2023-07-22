@@ -18,7 +18,7 @@ export default function RootLayout({ children }) {
       <body className={inter.className}>
         <Providers>
           <Nav />
-          <Box paddingX="350" paddingY="10" bg={'transparent'}>
+          <Box paddingX="250" paddingY="10" bg={'transparent'}>
             {children}
           </Box>
         </Providers>

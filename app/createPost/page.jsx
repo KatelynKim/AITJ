@@ -14,15 +14,19 @@ import {
   Input,
 } from '@chakra-ui/react'
 import { EditorState, convertToRaw, ContentState } from 'draft-js'
-import { Editor } from 'react-draft-wysiwyg'
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 import { useState, useEffect, useRef, createRef } from 'react'
 import { useRouter } from 'next/navigation'
+import dynamic from 'next/dynamic'
 
 import PollOption from 'components/PollOption'
 import BorderedBox from 'components/BorderedBox'
 import { useSession } from 'next-auth/react'
 
+const Editor = dynamic(
+  () => import('react-draft-wysiwyg').then((mod) => mod.Editor),
+  { ssr: false }
+)
 export default function CreatePostPage() {
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
@@ -47,7 +51,7 @@ export default function CreatePostPage() {
     }
   }, [optionCount])
 
-  const validateInputs = ({ title, pollOptions, content }) => {
+  const validateInputs = ({ title, pollOptions }) => {
     if (title.trim() === '') {
       toast({
         title: 'Empty title',
@@ -77,7 +81,7 @@ export default function CreatePostPage() {
 
   const handleSubmit = async () => {
     const contentState = editorState.getCurrentContent()
-    const contentRaw = convertToRaw(contentState)
+    const contentRaw = JSON.stringify(convertToRaw(contentState))
     const title = titleRef.current.value
     const votingLength = votingLengthRef.current.value
     const pollOptionValues = inputRefs.current.map(
@@ -95,9 +99,10 @@ export default function CreatePostPage() {
           method: 'POST',
           body: JSON.stringify({
             title,
-            author: session?.user?.id,
+            userId: session?.user?.id,
+            username: session?.user?.name,
             content: contentRaw,
-            votingLength
+            votingLength,
           }),
         })
         if (response.ok) {
@@ -166,7 +171,7 @@ export default function CreatePostPage() {
               )
             })}
 
-            <HStack justifyContent={'space-between'} >
+            <HStack justifyContent={'space-between'}>
               <IconButton
                 isDisabled={isAddButtonDisabled}
                 icon={<AddIcon />}
@@ -176,7 +181,12 @@ export default function CreatePostPage() {
 
               <HStack>
                 <Text whiteSpace={'nowrap'}> Voting length (days): </Text>
-                <Select defaultValue={7} w={100} marginRight={50} ref={votingLengthRef}>
+                <Select
+                  defaultValue={7}
+                  w={100}
+                  marginRight={50}
+                  ref={votingLengthRef}
+                >
                   <option value="1">1</option>
                   <option value="2">2</option>
                   <option value="3">3</option>
@@ -186,12 +196,10 @@ export default function CreatePostPage() {
                   <option value="7">7</option>
                 </Select>
               </HStack>
-
             </HStack>
           </Box>
 
-          <BorderedBox w={'30%'} h={200}>
-          </BorderedBox>
+          <BorderedBox w={'30%'} h={200}></BorderedBox>
         </HStack>
         <HStack justifyContent="flex-end">
           <Button variant="outline"> Save Draft </Button>
