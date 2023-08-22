@@ -10,12 +10,16 @@ import {
   VStack,
 } from '@chakra-ui/react'
 import { Editor } from 'draft-js'
-import React from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import BorderedBox from './BorderedBox'
 import Image from 'next/image'
+import { useSession } from 'next-auth/react'
+import { sendDeleteRequest, sendGetRequest, sendPatchRequest, sendPostRequest } from '@utils/requestUtils'
 
 const PostContent = ({ postData, editorState }) => {
+
   const {
+    _id: postId,
     title,
     username,
     content,
@@ -27,15 +31,151 @@ const PostContent = ({ postData, editorState }) => {
     createdAt,
   } = postData
 
+  const { data: session } = useSession()
+  const [likedStatus, setLikedStatus] = useState()
+  const [ voteCountSum, setVoteCountSum ] = useState(upVoteCount - downVoteCount)
+
+  const likeOrDislikeUrl = useMemo(() => {
+    if (session?.user?.id && postId) {
+      return `/api/likeOrDislike/${session.user.id}/${postId}`
+    }
+    return null
+  }, [session?.user?.id, postId])
+
+  useEffect(() => {
+    async function fetchLikedStatus() {
+      if (!session?.user?.id || !postId) {
+        return
+      }
+      const response = await sendGetRequest({
+        url: likeOrDislikeUrl,
+      })
+      const { liked } = await response.json()
+      setLikedStatus(liked)
+    }
+    fetchLikedStatus()
+  }, [session?.user?.id, postId, likeOrDislikeUrl])
+
+  const handleLikeButtonClick = async () => {
+    await sendPostRequest({
+      url: likeOrDislikeUrl,
+      body: {
+        userId: session.user.id,
+        postId,
+        liked: true,
+      },
+    })
+
+    // If performing the same action, we want to delete the like record.
+    if (likedStatus) {
+      console.log('we are repeating the same action')
+      setVoteCountSum((prev) => prev - 1 )
+      setLikedStatus(null)
+      await sendPatchRequest({
+        url: `/api/post/${postId}`,
+        body: {
+          ...postData,
+          upVoteCount: upVoteCount - 1
+        }
+      })
+      await sendDeleteRequest({
+        url: likeOrDislikeUrl
+      })
+      return
+    }
+
+    setLikedStatus(true)
+    setVoteCountSum((prev) => prev + 1 )
+    return await sendPatchRequest({
+      url: `/api/post/${postId}`,
+      body: {
+        ...postData,
+        upVoteCount: upVoteCount + 1
+      }
+    })
+  }
+
+  const handleDislikeButtonClick = async () => {
+    await sendPostRequest({
+      url: likeOrDislikeUrl,
+      body: {
+        userId: session.user.id,
+        postId,
+        liked: false,
+      },
+    })
+    if (likedStatus === false) {
+      setVoteCountSum((prev) => prev + 1 )
+      setLikedStatus(null)
+      return await sendDeleteRequest({
+        url: likeOrDislikeUrl
+      })
+    }
+    setLikedStatus(false)
+    setVoteCountSum((prev) => prev - 1 )
+    return await sendPatchRequest({
+      url: `/api/post/${postId}`,
+      body: {
+        ...postData,
+        downVoteCount: downVoteCount + 1
+      }
+    })
+  }
+
   const createdDate = new Date(createdAt)
   const createdDateConverted = createdDate.toLocaleString()
+
   return (
     <BorderedBox padding={16} width={'70%'}>
-      <Text>
-        {' '}
-        Posted by {username} on {createdDateConverted}{' '}
-      </Text>
-      <Heading> {title} </Heading>
+      <HStack gap={5}>
+        <VStack justifyContent={'center'}>
+          {likedStatus ? (
+            <Image
+              src="/arrow-up-filled.png"
+              alt="like post button"
+              height={50}
+              width={30}
+              onClick={handleLikeButtonClick}
+            />
+          ) : (
+            <Image
+              src="/arrow-up.png"
+              alt="like post button"
+              height={50}
+              width={30}
+              onClick={handleLikeButtonClick}
+            />
+          )}
+
+          <Text> { voteCountSum}</Text>
+          {likedStatus === false ? (
+            <Image
+              src="/arrow-down-filled.png"
+              alt="dislike post button"
+              height={50}
+              width={30}
+              onClick={handleDislikeButtonClick}
+            />
+          ) : (
+            <Image
+              src="/arrow-down.png"
+              alt="dislike post button"
+              height={50}
+              width={30}
+              onClick={handleDislikeButtonClick}
+            />
+          )}
+        </VStack>
+        <Box>
+          <Text>
+            {' '}
+            Posted by {username} on {createdDateConverted}{' '}
+          </Text>
+          <Heading> {title} </Heading>
+          <Text> {viewCount} views</Text>
+        </Box>
+      </HStack>
+
       <Divider marginY={4} />
       <Editor editorState={editorState} readOnly />
       <Divider marginY={4} />
@@ -46,36 +186,6 @@ const PostContent = ({ postData, editorState }) => {
           ))}
         </HStack>
       </Flex>
-
-      <HStack justifyContent={'center'}>
-        <Box
-          display={'flex'}
-          flexDirection={'column'}
-          justifyContent={'center'}
-          alignItems={'center'}
-          paddingTop={3}
-          borderRadius={1000}
-          w={'80px'}
-          h={'80px'}
-          border={'3px solid black'}
-        >
-          <Image src="/dislike.png" width={40} height={40} alt="Dislike post" />
-        </Box>
-        <Text fontSize={25}> {downVoteCount}</Text>
-        <Text fontSize={25}> {downVoteCount}</Text>
-        <Box
-          display={'flex'}
-          flexDirection={'column'}
-          justifyContent={'center'}
-          alignItems={'center'}
-          borderRadius={1000}
-          w={'80px'}
-          h={'80px'}
-          border={'3px solid black'}
-        >
-          <Image src="/like.png" width={40} height={40} alt="Like post" />
-        </Box>
-      </HStack>
 
       <Divider marginY={4} />
       <Textarea placeholder="Leave a comment" />

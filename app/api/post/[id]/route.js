@@ -13,31 +13,33 @@ export const GET = async (request, { params }) => {
 
     return new Response(JSON.stringify(post), { status: 200 })
   } catch (error) {
+    console.log('error:', error)
     return new Response('Internal Server Error', { status: 500 })
   }
 }
 
 export const PATCH = async (request, { params }) => {
-  const { post, tag } = await request.json()
+  const { title, upVoteCount, downVoteCount } = await request.json()
+  console.log('upVotecount', upVoteCount)
 
   try {
     await connectToDB()
 
-    // Find the existing prompt by ID
     const existingPost = await Post.findById(params.id)
-
     if (!existingPost) {
-      return new Response('Prompt not found', { status: 404 })
+      return new Response('Post not found', { status: 404 })
     }
 
     // Update the prompt with new data
-    existingPost.prompt = prompt
-    existingPost.tag = tag
+    existingPost.title = title
+    existingPost.upVoteCount = upVoteCount
+    existingPost.downVoteCount = downVoteCount
 
     await existingPost.save()
 
     return new Response('Successfully updated the post', { status: 200 })
   } catch (error) {
+    console.log('error:', error)
     return new Response('Error Updating Prompt', { status: 500 })
   }
 }
